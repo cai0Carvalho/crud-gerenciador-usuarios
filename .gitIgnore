@@ -1,0 +1,12 @@
+# Ignora a pasta bin/ (onde os arquivos compilados ficam)
+bin/
+
+# Ignora arquivos de compilação do Java
+*.class
+
+# Ignora arquivos de log, temporários ou outros gerados
+*.log
+*.tmp
+
+### VS Code ###
+.vscode/
