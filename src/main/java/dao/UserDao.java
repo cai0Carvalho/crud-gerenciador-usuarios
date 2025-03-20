@@ -74,7 +74,7 @@ public class UserDao {
     }
 
     // Método para atualizar um usuário pelo ID
-    public void updateuser(Users user){
+    public void updateUser(Users user){
         String sql = "UPDATE users SET username = ?, email = ? WHERE id = ?";
 
         try(Connection connection = ConnectionUtil.getConnection()){
