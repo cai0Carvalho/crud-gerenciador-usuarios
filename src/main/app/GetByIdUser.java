@@ -22,5 +22,6 @@ public class GetByIdUser {
         } else {
             System.out.println("Usuário não encontrado");
         }
+        sc.close();
     }
 }
