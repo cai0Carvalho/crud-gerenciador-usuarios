@@ -35,7 +35,7 @@ Crie um banco de dados PostgreSQL e configure as credenciais diretamente no cód
     String password = "sua_senha";
     Connection conexao = DriverManager.getConnection(url, user, password);
 ``` 
-3. Após clonar o repositório, vá até o package `app` e selecione a classe que deseja executar. (AddUser, DeleteUse, GetAllUsers, GetByIdUser ou UpdateUser)
+3. Após clonar o repositório, vá até o package `app` e selecione a classe que deseja executar. (AddUser, DeleteUser, GetAllUsers, GetByIdUser ou UpdateUser)
 
 4. Você pode executar a aplicação a partir de sua IDE de desenvolvimento Java clicando em Run.
 
