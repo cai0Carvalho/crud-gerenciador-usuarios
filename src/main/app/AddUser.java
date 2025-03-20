@@ -9,7 +9,7 @@ public class AddUser {
         Users user = new Users();
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("digite o nome de usuário para inserir no ");
+        System.out.println("digite o nome de usuário para inserir no banco de dados");
         user.setUsername(sc.nextLine());
 
         System.out.println("Digite o email do usuário para inserir no banco de dados");
