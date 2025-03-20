@@ -1,5 +1,5 @@
 ## Projeto - CRUD Gerenciador de Usuários
-Este é um projeto de um gerenciador de usuários, desenvolvido em Java com JDBC para interafir o banco de dados PostgreSQL.
+Este é um projeto de um gerenciador de usuários, desenvolvido em Java com JDBC para interagir com o banco de dados PostgreSQL.
 
 ## Funcionalidades
 - Adicionar novo usuário no banco de dados 
