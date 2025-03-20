@@ -26,9 +26,18 @@ Para executar a aplicação, siga os passos abaixo:
     ```bash 
     git clone https://github.com/cai0Carvalho/crud-gerenciador-usuarios.git
     ```
-2. Após clonar o repositório, vá até o package `app` e selecione a classe que deseja executar. (AddUser, DeleteUse, GetAllUsers, GetByIdUser ou UpdateUser)
 
-3. Você pode executar a aplicação a partir de sua IDE de desenvolvimento Java clicando em Run.
+2. Configurar o banco de dados
+Crie um banco de dados PostgreSQL e configure as credenciais diretamente no código onde a conexão JDBC é feita:
+``` java
+    String url = "jdbc:postgresql://localhost:5432/seu_banco";
+    String user = "seu_usuario";
+    String password = "sua_senha";
+    Connection conexao = DriverManager.getConnection(url, user, password);
+``` 
+3. Após clonar o repositório, vá até o package `app` e selecione a classe que deseja executar. (AddUser, DeleteUse, GetAllUsers, GetByIdUser ou UpdateUser)
+
+4. Você pode executar a aplicação a partir de sua IDE de desenvolvimento Java clicando em Run.
 
 ## Estrutuar do Projeto
 ### package app
