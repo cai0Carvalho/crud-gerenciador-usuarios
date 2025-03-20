@@ -7,9 +7,8 @@ import main.java.model.Users;
 
 public class GetByIdUser {
     public static void main(String[] args){
-
         Scanner sc = new Scanner(System.in);
-        System.out.println("Digite o Id do usuário");
+        System.out.println("Digite o ID do usuário:");
         int userId = sc.nextInt();
 
         UserDao userDao = new UserDao();

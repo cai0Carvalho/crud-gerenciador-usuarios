@@ -13,44 +13,51 @@ public class UserDao {
     private final Logger logger = Logger.getLogger(UserDao.class.getName());
 
     // Metódo para adicionar um usuário ao banco de dados
-    public void addUser(Users users){
-        // SQL para inserir um novo usuário apenas se não existir outro com o mesmo username ou email
-        String sql = "INSERT INTO users (username, email)" +
-                    "SELECT ?, ? " + 
-                    "WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = ? OR email = ?)";
+    public void addUser(Users users) {
+        // Obtém a conexão uma única vez e verifica se ela está válida
+        try (Connection connection = ConnectionUtil.getConnection()) {
+            if (connection == null || connection.isClosed()) {
+                System.out.println("Conexão inválida ou fechada.");
+                return; // Não executa a inserção se a conexão estiver fechada
+            }
 
-        //Define os parâmetros da query
-        try(PreparedStatement preparedStatement = ConnectionUtil.getConnection().prepareStatement(sql)){
-            
+        // SQL para inserir um novo usuário apenas se não existir outro com o mesmo username ou email
+        String sql = "INSERT INTO users (username, email) " +
+                     "SELECT ?, ? " + 
+                     "WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = ? OR email = ?)";
+
+        // Define os parâmetros da query
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             preparedStatement.setString(1, users.getUsername());
             preparedStatement.setString(2, users.getEmail());
             preparedStatement.setString(3, users.getUsername()); // Parâmetro para a subconsulta
-            preparedStatement.setString(4, users.getUsername()); // Parâmetro para a subconsulta
+            preparedStatement.setString(4, users.getEmail());  // Parâmetro para a subconsulta
 
-            //executa a query e obtém o número de linhas afetadas
+            // Executa a query e obtém o número de linhas afetadas
             int rowsInserted = preparedStatement.executeUpdate();
 
-            //se houver linhas inseridas (usuário único), obtém o ID gerado
-            if(rowsInserted > 0){
-                ResultSet generaredKey = preparedStatement.getGeneratedKeys();
-                if(generaredKey.next()){
-                    users.setId(generaredKey.getInt(1));
+            // Se houver linhas inseridas (usuário único), obtém o ID gerado
+            if (rowsInserted > 0) {
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        users.setId(generatedKeys.getInt(1));
+                    }
                 }
-                System.out.println("Usuário: "+ users.getUsername() + " e email: "+ users.getEmail() + "\" inseridos com sucesso!\"" );
-            } else{
+                System.out.println("Usuário: " + users.getUsername() + " e email: " + users.getEmail() + " inseridos com sucesso!");
+            } else {
                 System.out.println("Usuário: " + users.getUsername() + " ou email: " + users.getEmail() + " já cadastrados no banco de dados!");
             }
-            preparedStatement.close();// Fecha o PreparedStatement
-        }catch(SQLException e){
-            // Em caso de erro SQL, registra o erro no log
-            logger.log(Level.SEVERE, "Eroo ao tentar adicionar usuário no banco de dados",e);
         }
+    } catch (SQLException e) {
+        // Em caso de erro SQL, registra o erro no log
+        logger.log(Level.SEVERE, "Erro ao tentar adicionar usuário no banco de dados", e);
     }
-
+}
     // Método para buscar o usuário por ID
     public Users getUserById(int id){
         Users user = null;
-        String sql = "SELECT id, nome, email FROM users WHERE id = ?";
+        String sql = "SELECT id, username, email FROM users WHERE id = ?";
 
         try (Connection connection = ConnectionUtil.getConnection()){
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -87,23 +94,25 @@ public class UserDao {
             int rowsUpdate = preparedStatement.executeUpdate();
 
             if(rowsUpdate > 0){
-                String message = "User (ID: "+ user.getId() + ") ataualizado no bando de dados ";
-                if(Objects.equals(user.getUsername(), null)){
-                    if(Objects.equals(user.getEmail(), null)){
-                        System.out.println(message + "Nenhum dado foi alterado.");
-                    }else{
-                        message += "Email " + user.getEmail();
-                        System.out.println(message);
-                    }
-                }else{
-                    message += "Username: " + user.getUsername();
-                    if(Objects.equals(user.getEmail(), null)){
-                        System.out.println(message + "nenhuma dado foi alterado");
-                    } else {
-                        message += " e Email para: " + user.getEmail();
-                    }
-                    System.out.println(message);
+                StringBuilder message = new StringBuilder("User (ID: " + user.getId() + ") atualizado no banco de dados. ");
+
+                // Verifica se o username foi alterado
+                if (user.getUsername() != null) {
+                    message.append("Username alterado para: ").append(user.getUsername()).append(". ");
                 }
+
+                // Verifica se o email foi alterado
+                if (user.getEmail() != null) {
+                    message.append("Email alterado para: ").append(user.getEmail());
+                }
+
+                // Caso nenhum dado tenha sido alterado
+                if (user.getUsername() == null && user.getEmail() == null) {
+                    message.append("Nenhum dado foi alterado.");
+                }
+
+                System.out.println(message.toString());
+
             }else{
                 logger.log(Level.SEVERE, "Falha ao atualizar o usuário (ID: " + user.getId() +")." );
             }
@@ -114,7 +123,7 @@ public class UserDao {
 
     // Método para deletar um usuário pelo ID
     public void deleteUser(int userId){
-        String selectSql =  "SELECT id, nome email FROM users WHERE id = ?";
+        String selectSql =  "SELECT id, username, email FROM users WHERE id = ?";
         String deleteSql = "DELETE FROM users WHERE id = ?";
 
         try(Connection connection = ConnectionUtil.getConnection()){
@@ -135,12 +144,10 @@ public class UserDao {
             deleteStatement.setInt(1, userId);
             int rowsDeleted = deleteStatement.executeUpdate();
 
-            if(rowsDeleted > 0 && deletedUser != null){
-                System.out.println("Usuário deletado com sucesso" );
-                System.out.println("Id: " + deletedUser.getId() + ", Nome: " + deletedUser.getUsername() + ", Email: " + deletedUser.getEmail());
-            } else{
+            if (rowsDeleted <= 0 || deletedUser == null) {
                 logger.warning("Nenhum usuário encontrado com esse ID.");
             }
+    
         } catch(SQLException e){
             logger.log(Level.SEVERE, "Erro ao tentar excluir usuário do banco de dados", e);
         }
@@ -149,7 +156,7 @@ public class UserDao {
     //metódo para consultar todos os usários
     public List<Users> getAllUsers(){
         List<Users> userList = new ArrayList<>();
-        String sql = "SELECT id, name, username, email FROM users";
+        String sql = "SELECT id, username, email FROM users";
 
         try(Connection conn = ConnectionUtil.getConnection();
             PreparedStatement preparedStatement = conn.prepareStatement(sql)){

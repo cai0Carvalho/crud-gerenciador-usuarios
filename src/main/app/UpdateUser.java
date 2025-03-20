@@ -50,7 +50,8 @@ public class UpdateUser {
                 switch (escolha) {
                     case 1:
                         System.out.print("Digite o novo nome de usuário: ");
-                        String newUsername = scan.next();
+                        scan.nextLine();  // Limpar a linha residual se necessário
+                        String newUsername = scan.nextLine();  // Captura corretamente a linha inteira
                         users.setUsername(newUsername);
                         break;
                     case 2:
@@ -60,7 +61,8 @@ public class UpdateUser {
                         break;
                     case 3:
                         System.out.print("Digite o novo nome de usuário: ");
-                        String newUsername2 = scan.next();
+                        scan.nextLine();
+                        String newUsername2 = scan.nextLine();
                         users.setUsername(newUsername2);
 
                         System.out.print("Digite um novo email: ");

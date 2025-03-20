@@ -14,11 +14,12 @@ public class ConnectionUtil {
 
     public static Connection getConnection(){
 
-        try(Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)){
-            return connection;
-        } catch(SQLException e){
+        try {
+            // Cria uma nova conexão com o banco de dados
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (SQLException e) {
             logger.log(Level.SEVERE, "Erro ao conectar ao banco de dados", e);
+            return null;
         }
-        return null;
     }
 }

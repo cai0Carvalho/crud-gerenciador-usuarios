@@ -24,42 +24,43 @@ public class DeleteUser {
 
         // Exibe a lista de usuários com seus respectivos IDs
         for (Users users : usersList){
-            System.out.println("ID " + users.getId() + 
+            System.out.println("ID: " + users.getId() + 
             "| username: " + users.getUsername() + 
             "| email: " + users.getEmail());
         }
 
         // Loop para solicitar O ID do usuario ate que um ID válido seja fornecido
-        int userId;
+        int userId = -1;
         Users users = null;
 
-        do {
-            System.out.print("Digite o ID do usuário que deseja excluir (ou digite -1 para sair)");
+        while(true) {
+            System.out.print("Digite o ID do usuário que deseja excluir (ou digite -1 para sair): ");
             try {
                 userId = scan.nextInt();
-                scan.nextLine();
+                scan.nextLine();  // Limpa o buffer
 
                 // Sai do programa se o usuário digitar -1
                 if(userId == -1){
-                    System.out.println("Operaão cancelada pelo usuário.");
+                    System.out.println("Operação cancelada pelo usuário.");
                     break;
                 }
+
                 users = userDao.getUserById(userId);
 
-                //exclui o usuário se ele existir
+                // Exclui o usuário se ele existir
                 if(users != null){
                     userDao.deleteUser(userId);
                     System.out.println("Usuário deletado com sucesso.");
+                    System.out.println("Id: " + users.getId() + ", Nome: " + users.getUsername() + ", Email: " + users.getEmail());
                     break;
                 } else {
                     System.out.println("Usuário não encontrado. Tente novamente.");
                 }
-            }catch(InputMismatchException e){
+            } catch(InputMismatchException e) {
                 System.out.println("ID inválido, insira um número inteiro.");
-                scan.nextLine();
-                userId = -1; // Define userId como -1 para continuar o loop
+                scan.nextLine(); // Limpa o buffer
             }
-        } while(users == null);
+        }
         scan.close();
     }
 }
